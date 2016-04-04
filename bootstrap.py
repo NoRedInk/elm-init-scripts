@@ -3,16 +3,96 @@ import errno
 import os
 import os.path
 
+api_template = """
+module {module_name}.API where
+
+import Html exposing (Html)
+import StartApp
+import Effects exposing (Never)
+import Task exposing (Task)
+
+import {module_name}.Update exposing (update, Action(..), Addresses)
+import {module_name}.Model exposing (Model)
+import {module_name}.View exposing (view)
+
+
+app : StartApp.App Model
+app =
+    let
+        initModel : Model
+        initModel =
+            {{ }}
+
+        modelWithEffects =
+            (initModel, Effects.none)
+
+        addresses =
+            {{ }}
+    in
+        StartApp.start
+            {{ init = modelWithEffects
+            , view = view
+            , update = (update addresses)
+            , inputs = [ ]
+            }}
+
+main : Signal Html
+main =
+    app.html
+
+port authToken : String
+
+port tasks : Signal (Task.Task Never ())
+port tasks =
+    app.tasks
+""".lstrip()
+
 model_template = """
 module {module_name}.Model where
 
 type alias Model =
-  {{}}
+  {{ }}
 """.lstrip()
 
-def make_boilerplate(module_name, directory):
-    file_path = os.path.join(directory, 'Model.elm')
-    templated = model_template.format(module_name=module_name)
+update_template = """
+module {module_name}.Update where
+
+import Effects exposing (Effects)
+import {module_name}.Model exposing (..)
+
+type Action
+  = NoOp
+
+type alias Addresses =
+  {{ }}
+
+update : Addresses -> Action -> Model -> (Model, Effects.Effects Action)
+update addresses action model =
+  case action of
+    NoOp ->
+      (model, Effects.none)
+""".lstrip()
+
+view_template = """
+module {module_name}.View (..) where
+
+import Html exposing (..)
+import Html.Attributes
+import Html.Events
+import Signal
+
+import {module_name}.Model exposing (..)
+import {module_name}.Update exposing (..)
+
+
+view : Signal.Address Action -> Model -> Html
+view address model =
+  div [] [ text "Hello world!" ]
+""".lstrip()
+
+def make_boilerplate(module_name, directory, template, file_name):
+    file_path = os.path.join(directory, file_name)
+    templated = template.format(module_name=module_name)
 
     with open(file_path, 'w') as f:
         f.write(templated)
@@ -30,7 +110,10 @@ def bootstrap(module_name, root_directory):
     directory = os.path.join(root_directory, *module_name.split('.'))
 
     make_directory(directory)
-    make_boilerplate(module_name, directory)
+    make_boilerplate(module_name, directory, api_template, 'API.js.elm')
+    make_boilerplate(module_name, directory, model_template, 'Model.elm')
+    make_boilerplate(module_name, directory, update_template, 'Update.elm')
+    make_boilerplate(module_name, directory, view_template, 'View.elm')
 
 def main():
     parser = argparse.ArgumentParser(description='Initialize an Elm page')
