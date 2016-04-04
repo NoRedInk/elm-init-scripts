@@ -90,12 +90,21 @@ view address model =
   div [] [ text "Hello world!" ]
 """.lstrip()
 
+templates = {'API.js.elm': api_template,
+             'Model.elm': model_template,
+             'Update.elm': update_template,
+             'View.elm': view_template}
+
 def make_boilerplate(module_name, directory, template, file_name):
     file_path = os.path.join(directory, file_name)
     templated = template.format(module_name=module_name)
 
     with open(file_path, 'w') as f:
         f.write(templated)
+
+def make_boilerplates(module_name, directory, templates):
+    for file_name, template in templates.items():
+        make_boilerplate(module_name, directory, template, file_name)
 
 def make_directory(directory):
     try:
@@ -110,10 +119,7 @@ def bootstrap(module_name, root_directory):
     directory = os.path.join(root_directory, *module_name.split('.'))
 
     make_directory(directory)
-    make_boilerplate(module_name, directory, api_template, 'API.js.elm')
-    make_boilerplate(module_name, directory, model_template, 'Model.elm')
-    make_boilerplate(module_name, directory, update_template, 'Update.elm')
-    make_boilerplate(module_name, directory, view_template, 'View.elm')
+    make_boilerplates(module_name, directory, templates)
 
 def main():
     parser = argparse.ArgumentParser(description='Initialize an Elm page')
