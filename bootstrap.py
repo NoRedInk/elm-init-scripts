@@ -77,8 +77,8 @@ view_template = """
 module {module_name}.View (..) where
 
 import Html exposing (..)
-import Html.Attributes
-import Html.Events
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Signal
 
 import {module_name}.Model exposing (..)
