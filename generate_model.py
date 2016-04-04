@@ -24,6 +24,6 @@ def make_directory(directory):
         else:
             raise
 
-def boilerplate(module_name, directory):
+def bootstrap(module_name, directory):
     make_directory(directory)
     make_boilerplate(module_name, directory)
