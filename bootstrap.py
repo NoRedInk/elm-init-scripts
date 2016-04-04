@@ -90,10 +90,12 @@ view address model =
   div [] [ text "Hello world!" ]
 """.lstrip()
 
-templates = {'API.js.elm': api_template,
-             'Model.elm': model_template,
-             'Update.elm': update_template,
-             'View.elm': view_template}
+templates = {
+    'API.js.elm': api_template,
+    'Model.elm': model_template,
+    'Update.elm': update_template,
+    'View.elm': view_template
+}
 
 def make_boilerplate(module_name, directory, template, file_name):
     file_path = os.path.join(directory, file_name)
